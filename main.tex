@@ -1,0 +1,75 @@
+% Clean single-column starting point for Mechanism and Machine Theory.
+% Compile with: latexmk -pdf main.tex
+% All prose, names and declarations below are placeholders to replace.
+% CAS front-matter notes do not have normal hyperref footnote targets.
+\PassOptionsToPackage{hyperfootnotes=false}{hyperref}
+\documentclass[a4paper,fleqn]{cas-sc}
+% Add the class option `review' if double-spaced body text is desired.
+% Add `longmktitle' if the title/author/abstract block exceeds one page.
+
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xurl}
+
+% Use text labels for email/URL, so no thumbnail images are required.
+\makeatletter
+\ExplSyntaxOn
+\keys_set:nn { stm / mktitle } { nologo = true }
+% CAS 2.4 intentionally overlays the keyword box. Use an overlap box,
+% rather than an overfull zero-width box; retain the official layout.
+\cs_if_exist:cTF { environment~Abstract~code }
+  { \exp_args:Nc \patchcmd { environment~Abstract~code } }
+  { \exp_args:Nc \patchcmd { Abstract~code } }
+  { \hbox_to_wd:nn { \z@ } { \box \g_stm_key_box } }
+  { \hbox_overlap_right:n { \box \g_stm_key_box } }
+  {}{\PackageError{mmt-template}{CAS~abstract~patch~failed}{Check~the~CAS~version.}}
+% Do not print an empty ORCID footnote when no author supplies an ORCID.
+\cs_new_eq:NN \mmt_printorcid: \printorcid
+\RenewDocumentCommand \printorcid { }
+  { \seq_if_empty:NF \g_stm_orcid_seq { \mmt_printorcid: } }
+\ExplSyntaxOff
+\makeatother
+
+\begin{document}
+
+\shorttitle{Short manuscript title}
+\shortauthors{A. Author}
+\title[mode=title]{Your manuscript title}
+
+\author[1]{Alex Author}
+\cormark[1]
+\ead{author@example.com}
+\affiliation[1]{organization={Department, University},
+  addressline={Street address},
+  city={City},
+  postcode={Postal code},
+  country={Country}}
+\cortext[1]{Corresponding author}
+
+\input{00-abstract}
+
+% MMT: 1--6 English keywords.
+\begin{keywords}
+Mechanisms \sep Kinematics \sep Dynamics
+\end{keywords}
+
+% Highlights are submitted separately; see highlights.txt and README.md.
+\maketitle
+% Keep PDF metadata in sync with the author list; CAS's automatic author
+% metadata can contain a malformed trailing character with newer hyperref.
+\hypersetup{pdfauthor={Alex Author},
+  pdfsubject={Manuscript submitted to Mechanism and Machine Theory}}
+
+\input{01-introduction}
+\input{02-methods}
+\input{03-results-discussion}
+\input{04-conclusions}
+\input{05-credit}
+\input{06-competing-interest}
+\input{07-funding}
+\input{08-data-availability}
+\input{09-acknowledgements}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{ref}
+
+\end{document}
